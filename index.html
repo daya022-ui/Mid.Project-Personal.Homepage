@@ -12,6 +12,9 @@
 </head>
 <body>
 
+  <!-- Cursor -->
+  <div id="custom-cursor"></div>
+
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
@@ -47,9 +50,13 @@
   <!-- HERO -->
   <section class="hero" id="hero">
     <div class="hero-bg"></div>
+    <img src="img/daun.png" alt="" class="hero-deco">
     <div class="hero-content">
       <p class="hero-eyebrow reveal">Halo, saya</p>
-      <h1 class="hero-name reveal delay-1">NURHIDAYAH<br /><em>RAMADHANI</em></h1>
+      <div class="hero-name reveal delay-1">
+        <span class="hero-name-first">NURHIDAYAH</span>
+        <span class="hero-name-second">Ramadhani</span>
+      </div>
       <p class="hero-tagline reveal delay-2 typing-target"></p>
       <div class="hero-cta reveal delay-3">
         <a href="gallery.html" class="btn btn-primary">Lihat Karya</a>
@@ -91,7 +98,7 @@
   <section class="featured section" id="featured">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Karya Terbaru</span>
+        <span class="section-label">KARYA TERBARU</span>
         <h2 class="section-title">Project Pilihan</h2>
       </div>
       
@@ -201,5 +208,6 @@
   <script>
   feather.replace();
 </script>
+
 </body>
 </html>

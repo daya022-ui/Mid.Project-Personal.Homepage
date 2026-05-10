@@ -1,278 +1,359 @@
-    document.addEventListener('DOMContentLoaded', () => {
+/* ============================================================
+   MAIN.JS — Nurhidayah Portfolio
+   Fix: Hamburger menu mobile + Navbar scroll + semua fitur
+   ============================================================ */
 
-    /* DARK MODE */
-    const html = document.documentElement;
-    const themeToggle = document.getElementById('themeToggle');
-    const STORAGE_KEY = 'nr-theme';
+document.addEventListener('DOMContentLoaded', () => {
 
-    // Load saved or system preference
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    let isDark = saved ? saved === 'dark' : prefersDark;
+  /* ─────────────────────────────────────────
+     1. HAMBURGER MENU (FIX UTAMA)
+  ───────────────────────────────────────── */
+  const hamburger = document.getElementById('hamburger');
+  const navLinks  = document.getElementById('navLinks');
 
-    function applyTheme(dark) {
-        html.setAttribute('data-theme', dark ? 'dark' : 'light');
-        const icon = themeToggle?.querySelector('.theme-icon');
-        if (icon) icon.textContent = dark ? '☀' : '☾';
-        isDark = dark;
-        localStorage.setItem(STORAGE_KEY, dark ? 'dark' : 'light');
-    }
+  function openMenu() {
+    navLinks.classList.add('open');
+    hamburger.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden'; // cegah scroll saat menu terbuka
+  }
 
-    applyTheme(isDark);
+  function closeMenu() {
+    navLinks.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
 
-    themeToggle?.addEventListener('click', () => applyTheme(!isDark));
-
-    /* NAVBAR SCROLL EFFECT */
-    const navbar = document.getElementById('navbar');
-
-    function handleScroll() {
-        if (!navbar) return;
-        navbar.classList.toggle('scrolled', window.scrollY > 20);
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // run once on load
-
-    /* HAMBURGER MENU */
-    const hamburger = document.getElementById('hamburger');
-    const navLinks  = document.getElementById('navLinks');
-
-    function closeMenu() {
-        navLinks?.classList.remove('open');
-        hamburger?.classList.remove('open');
-        hamburger?.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-    }
-
-    hamburger?.addEventListener('click', () => {
-        const isOpen = navLinks.classList.toggle('open');
-        hamburger.classList.toggle('open', isOpen);
-        hamburger.setAttribute('aria-expanded', String(isOpen));
-        document.body.style.overflow = isOpen ? 'hidden' : '';
-    });
-
-    // Close on any nav-link click
-    navLinks?.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', closeMenu);
-    });
-
-    // Close on outside click
-    document.addEventListener('click', e => {
-        if (
-        navLinks?.classList.contains('open') &&
-        !navLinks.contains(e.target) &&
-        !hamburger?.contains(e.target)
-        ) {
+  if (hamburger && navLinks) {
+    // Klik hamburger = toggle menu
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (navLinks.classList.contains('open')) {
         closeMenu();
-        }
+      } else {
+        openMenu();
+      }
     });
 
-    // Close on Escape key
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeMenu();
+    // Klik salah satu link = tutup menu
+    navLinks.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', closeMenu);
     });
 
-    /* SCROLL REVEAL */
-    const revealEls = document.querySelectorAll('.reveal');
+    // Klik di luar navbar = tutup menu
+    document.addEventListener('click', (e) => {
+      const navbar = document.getElementById('navbar');
+      if (navLinks.classList.contains('open') && navbar && !navbar.contains(e.target)) {
+        closeMenu();
+      }
+    });
 
-    if (revealEls.length) {
-        if ('IntersectionObserver' in window) {
-        const obs = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                obs.unobserve(entry.target);
-            }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    // Tekan Escape = tutup menu
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navLinks.classList.contains('open')) {
+        closeMenu();
+      }
+    });
+  }
 
-        revealEls.forEach(el => obs.observe(el));
+  /* ─────────────────────────────────────────
+     2. NAVBAR SCROLL EFFECT
+  ───────────────────────────────────────── */
+  const navbar = document.getElementById('navbar');
+
+  function handleScroll() {
+    if (!navbar) return;
+    if (window.scrollY > 20) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll(); // jalankan sekali saat load
+
+  /* ─────────────────────────────────────────
+     3. DARK MODE
+  ───────────────────────────────────────── */
+  const html = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const STORAGE_KEY = 'nr-theme';
+
+  // Baca preferensi tersimpan atau sistem
+  const saved      = localStorage.getItem(STORAGE_KEY);
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let isDark = saved ? (saved === 'dark') : prefersDark;
+
+  function applyTheme(dark) {
+    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+    const icon = themeToggle ? themeToggle.querySelector('.theme-icon') : null;
+    if (icon) icon.textContent = dark ? '☀' : '☾';
+    isDark = dark;
+    localStorage.setItem(STORAGE_KEY, dark ? 'dark' : 'light');
+  }
+
+  applyTheme(isDark);
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => applyTheme(!isDark));
+  }
+
+  /* ─────────────────────────────────────────
+     4. SCROLL REVEAL
+  ───────────────────────────────────────── */
+  const revealEls = document.querySelectorAll('.reveal');
+
+  if (revealEls.length) {
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+      revealEls.forEach(el => obs.observe(el));
+    } else {
+      // Fallback browser lama
+      function revealFallback() {
+        revealEls.forEach(el => {
+          const top = el.getBoundingClientRect().top;
+          if (top < window.innerHeight - 80) {
+            el.classList.add('visible');
+          }
+        });
+      }
+      window.addEventListener('scroll', revealFallback, { passive: true });
+      revealFallback();
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     5. TYPING ANIMATION  (index.html)
+  ───────────────────────────────────────── */
+  const typingTarget = document.querySelector('.typing-target');
+  if (typingTarget) {
+    const phrases = ['Software Engineer.', 'BackEnd Developer.', 'AI Enthusiast.'];
+    let pi = 0, ci = 0, deleting = false;
+
+    function typeLoop() {
+      const phrase = phrases[pi];
+
+      if (deleting) {
+        typingTarget.textContent = phrase.substring(0, ci - 1);
+        ci--;
+      } else {
+        typingTarget.textContent = phrase.substring(0, ci + 1);
+        ci++;
+      }
+
+      let speed = deleting ? 50 : 100;
+
+      if (!deleting && ci === phrase.length) {
+        deleting = true;
+        speed = 2000;
+      } else if (deleting && ci === 0) {
+        deleting = false;
+        pi = (pi + 1) % phrases.length;
+        speed = 500;
+      }
+
+      setTimeout(typeLoop, speed);
+    }
+
+    setTimeout(typeLoop, 600);
+  }
+
+  /* ─────────────────────────────────────────
+     6. GALLERY FILTER  (gallery.html)
+  ───────────────────────────────────────── */
+  const filterBtns   = document.querySelectorAll('.filter-btn');
+  const masonryItems = document.querySelectorAll('.masonry-item');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const filter = this.dataset.filter;
+
+      masonryItems.forEach(item => {
+        const cat  = item.dataset.category;
+        const show = filter === 'all' || cat === filter;
+
+        if (show) {
+          item.style.opacity   = '1';
+          item.style.transform = 'scale(1)';
+          item.classList.remove('hidden');
         } else {
-        // Fallback for older browsers
-        revealEls.forEach(el => el.classList.add('visible'));
+          item.style.opacity   = '0';
+          item.style.transform = 'scale(0.92)';
+          setTimeout(() => item.classList.add('hidden'), 280);
         }
-    }
-
-    /* TYPING ANIMATION  (index.html) */
-    const typingTarget = document.querySelector('.typing-target');
-    if (typingTarget) {
-        const phrases = ['Software Engineer.', 'Backend Developer.', 'AI Enthusiast.'];
-        let pi = 0, ci = 0, deleting = false;
-
-        function typeLoop() {
-        const phrase = phrases[pi];
-        typingTarget.textContent = deleting
-            ? phrase.substring(0, ci - 1)
-            : phrase.substring(0, ci + 1);
-
-        deleting ? ci-- : ci++;
-
-        let speed = deleting ? 50 : 100;
-
-        if (!deleting && ci === phrase.length) {
-            deleting = true;
-            speed = 2000;         
-        } else if (deleting && ci === 0) {
-            deleting = false;
-            pi = (pi + 1) % phrases.length;
-            speed = 500;
-        }
-
-        setTimeout(typeLoop, speed);
-        }
-
-        setTimeout(typeLoop, 600);
-    }
-
-    /* GALLERY FILTER */
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const masonryItems = document.querySelectorAll('.masonry-item');
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-
-        const filter = this.dataset.filter;
-
-        masonryItems.forEach(item => {
-            const cat = item.dataset.category;
-            const show = filter === 'all' || cat === filter;
-            item.style.opacity    = show ? '1' : '0';
-            item.style.transform  = show ? 'scale(1)' : 'scale(0.92)';
-
-            // Delay hiding so transition plays
-            if (show) {
-            item.classList.remove('hidden');
-            } else {
-            setTimeout(() => item.classList.add('hidden'), 280);
-            }
-        });
-        });
+      });
     });
+  });
 
-    /* LIGHTBOX */
-    let currentIdx   = 0;
-    let visibleItems = [];
+  /* ─────────────────────────────────────────
+     7. LIGHTBOX  (gallery.html)
+  ───────────────────────────────────────── */
+  let currentIdx   = 0;
+  let visibleItems = [];
 
-    const lightbox        = document.getElementById('lightbox');
-    const lightboxImgWrap = document.getElementById('lightboxImgWrap');
-    const lightboxBackdrop= document.getElementById('lightboxBackdrop');
-    const lightboxClose   = document.getElementById('lightboxClose');
-    const lightboxTitle   = document.getElementById('lightboxTitle');
-    const lightboxDesc    = document.getElementById('lightboxDesc');
-    const lightboxNext    = document.getElementById('lightboxNext');
-    const lightboxPrev    = document.getElementById('lightboxPrev');
+  const lightbox         = document.getElementById('lightbox');
+  const lightboxImgWrap  = document.getElementById('lightboxImgWrap');
+  const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+  const lightboxClose    = document.getElementById('lightboxClose');
+  const lightboxTitle    = document.getElementById('lightboxTitle');
+  const lightboxDesc     = document.getElementById('lightboxDesc');
+  const lightboxNext     = document.getElementById('lightboxNext');
+  const lightboxPrev     = document.getElementById('lightboxPrev');
 
-    function showLightbox(idx) {
-        const item = visibleItems[idx];
-        if (!item) return;
+  function showInLightbox(idx) {
+    const item = visibleItems[idx];
+    if (!item) return;
 
-        const src   = item.dataset.src  || '';
-        const title = item.querySelector('h3')?.textContent || '';
-        const desc  = item.dataset.desc || '';
+    const src   = item.dataset.src  || '';
+    const title = item.dataset.title || item.querySelector('h3')?.textContent || '';
+    const desc  = item.dataset.desc  || '';
 
-        lightboxImgWrap.innerHTML = src
-        ? `<img src="${src}" alt="${title}">`
-        : `<div style="padding:3rem;color:#fff;font-style:italic">Tidak ada gambar</div>`;
-
-        if (lightboxTitle) lightboxTitle.textContent = title;
-        if (lightboxDesc)  lightboxDesc.textContent  = desc;
-        currentIdx = idx;
+    if (lightboxImgWrap) {
+      lightboxImgWrap.innerHTML = src
+        ? `<img src="${src}" alt="${title}" style="width:100%;height:auto;max-height:70vh;object-fit:contain;">`
+        : `<div style="padding:3rem;color:#fff;text-align:center;font-style:italic">Gambar tidak tersedia</div>`;
     }
 
-    function openLightbox(idx) {
-        visibleItems = Array.from(document.querySelectorAll('.masonry-item:not(.hidden)'));
-        showLightbox(idx);
-        lightbox?.classList.add('open');
-        lightboxBackdrop?.classList.add('open');
-        document.body.style.overflow = 'hidden';
+    if (lightboxTitle) lightboxTitle.textContent = title;
+    if (lightboxDesc)  lightboxDesc.textContent  = desc;
+    currentIdx = idx;
+  }
+
+  function openLightbox(idx) {
+    visibleItems = Array.from(document.querySelectorAll('.masonry-item:not(.hidden)'));
+    showInLightbox(idx);
+    lightbox?.classList.add('open');
+    lightboxBackdrop?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox?.classList.remove('open');
+    lightboxBackdrop?.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  const masonryGrid = document.getElementById('masonryGrid');
+  masonryGrid?.addEventListener('click', (e) => {
+    const item = e.target.closest('.masonry-item');
+    if (!item) return;
+    visibleItems = Array.from(document.querySelectorAll('.masonry-item:not(.hidden)'));
+    openLightbox(visibleItems.indexOf(item));
+  });
+
+  lightboxClose?.addEventListener('click', closeLightbox);
+  lightboxBackdrop?.addEventListener('click', closeLightbox);
+
+  lightboxNext?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (visibleItems.length > 1) showInLightbox((currentIdx + 1) % visibleItems.length);
+  });
+
+  lightboxPrev?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (visibleItems.length > 1) showInLightbox((currentIdx - 1 + visibleItems.length) % visibleItems.length);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox?.classList.contains('open')) return;
+    if (e.key === 'ArrowRight') lightboxNext?.click();
+    if (e.key === 'ArrowLeft')  lightboxPrev?.click();
+    if (e.key === 'Escape')     closeLightbox();
+  });
+
+  // Swipe touch untuk lightbox
+  let touchStartX = 0;
+  lightbox?.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  lightbox?.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      dx < 0 ? lightboxNext?.click() : lightboxPrev?.click();
     }
+  }, { passive: true });
 
-    function closeLightbox() {
-        lightbox?.classList.remove('open');
-        lightboxBackdrop?.classList.remove('open');
-        document.body.style.overflow = '';
+  /* ─────────────────────────────────────────
+     8. WEATHER (AJAX)  — index.html
+  ───────────────────────────────────────── */
+  const tempEl = document.getElementById('weather-temp');
+  if (tempEl) {
+    const API_KEY = '457b71f4611fb73fcd91272cc2b1b654';
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=Manado&appid=${API_KEY}&units=metric`;
+
+    fetch(url)
+      .then(r => {
+        if (!r.ok) throw new Error('Weather fetch failed');
+        return r.json();
+      })
+      .then(data => {
+        tempEl.textContent = `${Math.round(data.main.temp)}°C`;
+        tempEl.title = `${data.name}: ${data.weather[0].description}`;
+      })
+      .catch(() => {
+        tempEl.textContent = '--°C';
+      });
+  }
+
+  /* ─────────────────────────────────────────
+     9. RANDOM QUOTE (AJAX)  — index.html
+  ───────────────────────────────────────── */
+  const quoteTextEl   = document.getElementById('quote-text');
+  const quoteAuthorEl = document.getElementById('quote-author');
+
+  async function fetchQuote() {
+    try {
+      const proxy = 'https://api.allorigins.win/get?url=' +
+        encodeURIComponent('https://zenquotes.io/api/random');
+      const res  = await fetch(proxy);
+      const data = await res.json();
+      const q    = JSON.parse(data.contents)[0];
+      if (quoteTextEl)   quoteTextEl.textContent   = `"${q.q}"`;
+      if (quoteAuthorEl) quoteAuthorEl.textContent = `— ${q.a}`;
+    } catch {
+      if (quoteTextEl)   quoteTextEl.textContent   = '"Teruslah melangkah, apa pun tantangannya."';
+      if (quoteAuthorEl) quoteAuthorEl.textContent = '— Anonim';
     }
+  }
 
-    const grid = document.getElementById('masonryGrid');
-    grid?.addEventListener('click', e => {
-        const item = e.target.closest('.masonry-item');
-        if (!item) return;
-        visibleItems = Array.from(document.querySelectorAll('.masonry-item:not(.hidden)'));
-        openLightbox(visibleItems.indexOf(item));
-    });
+  if (quoteTextEl) fetchQuote();
 
-    lightboxClose?.addEventListener('click', closeLightbox);
-    lightboxBackdrop?.addEventListener('click', closeLightbox);
+  const quoteBtn = document.getElementById('new-quote-btn');
+  quoteBtn?.addEventListener('click', fetchQuote);
 
-    lightboxNext?.addEventListener('click', e => {
-        e.stopPropagation();
-        showLightbox((currentIdx + 1) % visibleItems.length);
-    });
-    lightboxPrev?.addEventListener('click', e => {
-        e.stopPropagation();
-        showLightbox((currentIdx - 1 + visibleItems.length) % visibleItems.length);
-    });
+/* ─────────────────────────────────────────
+   10. CUSTOM CURSOR
+───────────────────────────────────────── */
+const cursor = document.getElementById('custom-cursor');
+if (cursor) {
+  document.addEventListener('mousemove', (e) => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
 
-    document.addEventListener('keydown', e => {
-        if (!lightbox?.classList.contains('open')) return;
-        if (e.key === 'ArrowRight') lightboxNext?.click();
-        if (e.key === 'ArrowLeft')  lightboxPrev?.click();
-        if (e.key === 'Escape')     closeLightbox();
-    });
+  // Efek saat hover elemen klikable (opsional)
+  const clickables = document.querySelectorAll('a, button, [role="button"]');
+  clickables.forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.style.transform = 'translate(-50%, -50%) scale(1.3)');
+    el.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%, -50%) scale(1)');
+  });
 
-    // Touch swipe for lightbox
-    let touchStartX = 0;
-    lightbox?.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-    lightbox?.addEventListener('touchend',   e => {
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(dx) > 60) dx < 0 ? lightboxNext?.click() : lightboxPrev?.click();
-    }, { passive: true });
-
-    /* WEATHER (AJAX)  */
-    const tempEl = document.getElementById('weather-temp');
-
-    if (tempEl) {
-        const API_KEY = '457b71f4611fb73fcd91272cc2b1b654';
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=Manado&appid=${API_KEY}&units=metric`;
-
-        fetch(url)
-        .then(r => {
-            if (!r.ok) throw new Error('Weather fetch failed');
-            return r.json();
-        })
-        .then(data => {
-            tempEl.textContent = `${Math.round(data.main.temp)}°C`;
-            tempEl.title = `${data.name}: ${data.weather[0].description}`;
-        })
-        .catch(() => {
-            tempEl.textContent = '--°C';
-        });
-    }
-
-    /* RANDOM QUOTE (AJAX) */
-    const quoteText   = document.getElementById('quote-text');
-    const quoteAuthor = document.getElementById('quote-author');
-
-    async function fetchQuote() {
-        try {
-        const proxy = 'https://api.allorigins.win/get?url=' +
-            encodeURIComponent('https://zenquotes.io/api/random');
-        const res  = await fetch(proxy);
-        const data = await res.json();
-        const q    = JSON.parse(data.contents)[0];
-        if (quoteText)   quoteText.textContent   = `"${q.q}"`;
-        if (quoteAuthor) quoteAuthor.textContent = `— ${q.a}`;
-        } catch {
-        if (quoteText)   quoteText.textContent   = '"Teruslah melangkah, apa pun tantangannya."';
-        if (quoteAuthor) quoteAuthor.textContent = '— Anonim';
-        }
-    }
-
-    if (quoteText) fetchQuote();
-
-    const quoteBtn = document.getElementById('new-quote-btn');
-    quoteBtn?.addEventListener('click', fetchQuote);
-
-    });
+  // Sembunyikan saat cursor keluar jendela
+  document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
+  document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
+}
+  
+}); // end DOMContentLoaded
